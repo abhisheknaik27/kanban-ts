@@ -1,5 +1,7 @@
+import KanbanBoard from "./components/KanbanBoard";
+
 const App = () => {
-  return <div className="bg-gray-500">hey</div>;
+  return <KanbanBoard />;
 };
 
 export default App;
