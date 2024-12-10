@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import PlusIcon from "../icons/PlusIcon";
-import { Column, Id } from "../types";
+import { Column, Id, Task } from "../types";
 import ColumnContainer from "./ColumnContainer";
 import { createPortal } from "react-dom";
 import {
@@ -17,6 +17,7 @@ import { arrayMove, SortableContext } from "@dnd-kit/sortable";
 const KanbanBoard = () => {
   const [activeColumn, setActiveColumn] = useState<Column | null>(null);
   const [columns, setColumns] = useState<Column[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
   console.log(columns);
 
   const columnsId = useMemo(() => columns.map((col) => col.id), [columns]);
@@ -45,6 +46,19 @@ const KanbanBoard = () => {
     setColumns(newColumns);
   };
 
+  const deleteTask = (id: Id) => {
+    const newTasks = tasks.filter((task) => task.id !== id);
+    setTasks(newTasks);
+  };
+
+  const createTask = (columnId: Id) => {
+    const newTask: Task = {
+      id: generateId(),
+      columnId,
+      content: `Task ${tasks.length + 1}`,
+    };
+    setTasks([...tasks, newTask]);
+  };
   const onDragStart = (e: DragStartEvent) => {
     if (e.active.data.current?.type === "Column") {
       setActiveColumn(e.active.data.current.column);
@@ -95,6 +109,9 @@ const KanbanBoard = () => {
                   column={col}
                   deleteColumn={deleteColumn}
                   updateColumn={updateColumn}
+                  createTask={createTask}
+                  tasks={tasks.filter((task) => task.columnId === col.id)}
+                  deleteTask={deleteTask}
                 />
               ))}
             </SortableContext>
@@ -114,6 +131,11 @@ const KanbanBoard = () => {
                 column={activeColumn}
                 deleteColumn={deleteColumn}
                 updateColumn={updateColumn}
+                createTask={createTask}
+                tasks={tasks.filter(
+                  (task) => task.columnId === activeColumn.id
+                )}
+                deleteTask={deleteTask}
               />
             )}
           </DragOverlay>,
